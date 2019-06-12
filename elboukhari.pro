@@ -24,7 +24,7 @@
 # <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 #----------------------------------------------------------
 
-QT += phonon
+QT += core gui phonon4qt5 widgets network xml  sql
 TARGET = elboukhari
 TEMPLATE = app
 SOURCES += main.cpp \
