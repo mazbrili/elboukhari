@@ -25,14 +25,14 @@
 //  <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 // ----------------------------------------------------------
 
-#include <QtGui/QApplication>
+#include <QApplication>
 #include "mainwindow.h"
 #include <QSplashScreen>
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     a.setApplicationName("El boukhari");
-    a.setOrganizationName("Abou zakaria");
+    a.setOrganizationName("Abouzakaria");
     QPixmap pixmap(":/images/sahih.png");
     QSplashScreen splash(pixmap);
 
