@@ -25,8 +25,17 @@
 #----------------------------------------------------------
 
 QT += core gui phonon4qt5 widgets network xml  sql
-TARGET = elboukhari
-TEMPLATE = app
+haiku{
+	TARGET = Elboukhari
+	TEMPLATE = app
+	CONFIG += link_pkgconfig
+	PKGCONFIG += phonon4qt5
+	}
+	else
+	{
+		TARGET = elboukhari
+		TEMPLATE = app
+	}
 SOURCES += main.cpp \
     mainwindow.cpp
 HEADERS += mainwindow.h
