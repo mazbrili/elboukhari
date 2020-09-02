@@ -40,6 +40,8 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QSettings>
+#include <QStandardPaths>
+#include <QTimer>
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
         ui(new Ui::MainWindow),settingsDialog(0), UI(0)
@@ -97,9 +99,10 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 MainWindow::~MainWindow()
-{
-    delete ui;
-    saveSettings();
+{	saveSettings();
+	m_MediaObject.stop();	
+	delete ui;
+	QTimer::singleShot(0,qApp,&QCoreApplication::quit);
 }
 
 void MainWindow::changeEvent(QEvent *e)
@@ -163,7 +166,8 @@ void MainWindow::on_actionPlayPause_triggered()
 }
 
 void MainWindow::on_actionStop_triggered()
-{
+{ 
+	if (m_MediaObject.state() == Phonon::PlayingState)
     m_MediaObject.stop();
 }
 
@@ -366,7 +370,8 @@ void MainWindow::creatFahrasa()
     treeWidgetFahrasa->setColumnHidden(1,true);
     treeWidgetFahrasa->headerItem()->setText(0,trUtf8("فهرسة صحيح البخاري"));
     treeWidgetFahrasa->headerItem()->setTextAlignment(0,Qt::AlignHCenter);
-    treeWidgetFahrasa->header()->setStyleSheet("QHeaderView::section {"
+	/*  disable mazbrili 
+		treeWidgetFahrasa->header()->setStyleSheet("QHeaderView::section {"
                                                "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
                                                "stop:0 #AE7F54, stop: 0.5 #704F31,"
                                                "stop: 0.6 #493421, stop:1 #8D6745);"
@@ -375,6 +380,17 @@ void MainWindow::creatFahrasa()
                                                " border-radius: 2px;"
                                                "border: 1px solid #2C1F12;}"
                                                );
+	
+	treeWidgetFahrasa->header->setStyleSheet("QHeaderView::section {"
+                                               "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                                               "stop:0 #AE7F54, stop: 0.5 #704F31,"
+                                               "stop: 0.6 #493421, stop:1 #8D6745);"
+                                               "color: white;"
+                                               "padding: 4px;"
+                                               " border-radius: 2px;"
+                                               "border: 1px solid #2C1F12;}"
+                                               );
+											   */
     connect(treeWidgetFahrasa, SIGNAL(itemActivated(QTreeWidgetItem*,int)), this, SLOT(fahrasItemActivated(QTreeWidgetItem*)));
 
     //treeWidgetFahrasa->header()->setVisible(false);
@@ -463,7 +479,8 @@ void MainWindow::treeChargeFahrassa()
     xml.clear();
     fileXml.close();
     setCurentPage(m_curIndex);
-    m_MediaObject.stop();
+     if (m_MediaObject.state() == Phonon::PlayingState)
+            m_MediaObject.stop();
 }
 
 // animation
@@ -629,6 +646,7 @@ void MainWindow::stateChanged(Phonon::State newstate, Phonon::State oldstate)
 
    case Phonon::StoppedState:
         ui->actionPlayPause->setIcon(playIcon);
+        m_MediaObject.stop();
         break;
 
   case Phonon::LoadingState:
@@ -729,8 +747,8 @@ QString MainWindow::convertText(QString txt)
 {
 
     QRegExp rx("(\\d+)( -)");
-
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+	//mazbrili edit
+    //QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
     QTextDocument *document=new QTextDocument;
     document->setPlainText(txt);
     QTextCursor highlightCursor(document);
@@ -809,8 +827,10 @@ void MainWindow::openFont()
 void MainWindow::loadSettings()//load
 {
 
-    QSettings settings(QDir::homePath()+"/.boukhari",QSettings::IniFormat);
-    settings.beginGroup("MainWindow");
+    //mazbrili mods
+   //QSettings settings(QDir::homePath()+"/.boukhari",QSettings::IniFormat);
+    QSettings settings(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)+"/setting.ini",QSettings::IniFormat);
+   settings.beginGroup("MainWindow");
 #ifdef  Q_WS_X11
     m_font=settings.value("font","KacstBook,16,-1,5,50,0,0,0,0,0").toString();
 #else
@@ -827,9 +847,8 @@ void MainWindow::loadSettings()//load
 }
 void MainWindow::saveSettings()//حفظ البيانات الى ملف
 {
-    QSettings settings(QDir::homePath()+"/.boukhari",
-                       QSettings::IniFormat);
-
+    //QSettings settings(QDir::homePath()+"/.boukhari", QSettings::IniFormat);
+    QSettings settings(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)+"/setting.ini",QSettings::IniFormat);	
     settings.beginGroup("MainWindow");
 
     settings.setValue("font", m_font);
